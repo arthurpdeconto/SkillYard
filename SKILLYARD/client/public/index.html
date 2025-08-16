@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>SkillYard — Troca de Habilidades</title>
+  <link rel="icon" href="/logo.svg" />
+  <link rel="stylesheet" href="/styles.css" />
+  <meta name="description" content="Troque habilidades de maneira simples e segura. Cadastre-se, publique o que você sabe e peça o que precisa.">
+</head>
+<body>
+  <header class="navbar">
+    <div class="navbar-inner container">
+      <div class="brand" style="gap:14px">
+        <img src="/logo.svg" alt="SkillYard" />
+        <span>SkillYard</span>
+      </div>
+      <nav style="display:flex; gap:10px; align-items:center">
+        <button id="loginBtn" class="btn">Entrar / Cadastrar</button>
+        <button id="logoutBtn" class="btn secondary hidden">Sair</button>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Landing -->
+  <main id="landing">
+    <section class="hero container">
+      <div class="hero-grid">
+        <div>
+          <h1>Troque habilidades com pessoas reais</h1>
+          <p>Conecte-se a quem pode ensinar, aprender ou colaborar. No SkillYard você lista suas habilidades, encontra outras e combina trocas de forma fácil e direta.</p>
+          <div class="cta">
+            <button class="btn" onclick="document.getElementById('loginBtn').click()">Começar agora</button>
+            <button class="btn ghost" onclick="document.getElementById('features').scrollIntoView({behavior:'smooth'})">Como funciona</button>
+          </div>
+        </div>
+        <div class="card">
+          <h3 style="margin:0 0 8px">Descubra habilidades populares</h3>
+          <p class="muted">Exemplos: Inglês conversação, Edição de vídeo, Violão básico, Programação JS, Design UI/UX.</p>
+          <div class="tags" style="margin-top:12px">
+            <span class="tag">Espanhol</span>
+            <span class="tag">Matemática</span>
+            <span class="tag">Excel</span>
+            <span class="tag">Tenis de Mesa</span>
+            <span class="tag">Python</span>
+            <span class="tag">TypeScript</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="features" class="container section">
+      <div class="grid">
+        <div class="card">
+          <h3>Cadastre o que você sabe</h3>
+          <p class="muted">Publique suas habilidades em minutos e deixe outras pessoas encontrarem você.</p>
+        </div>
+        <div class="card">
+          <h3>Peça o que precisa</h3>
+          <p class="muted">Busque por área, tags ou palavras-chave. Envie um pedido de troca em um clique.</p>
+        </div>
+        <div class="card">
+          <h3>Troca segura</h3>
+          <p class="muted">Gerencie pedidos e avalie parceiros após concluir.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="container section">
+      <h2 style="margin: 0 0 12px">Habilidades recentes</h2>
+      <div id="skillsGrid" class="grid"></div>
+    </section>
+
+    <footer class="footer">
+      © <span id="y"></span> SkillYard — Feito por Arthur Philipp De Conto SENAC 2025
+      <script>document.getElementById('y').textContent = new Date().getFullYear()</script>
+    </footer>
+  </main>
+
+  <!-- Dashboard -->
+  <main id="dashboard" class="hidden">
+    <section class="container section">
+      <div class="card" style="display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap">
+        <div>
+          <h2 style="margin:0">Bem-vindo, <span id="welcomeName">Usuário</span> 👋</h2>
+          <p class="muted" style="margin:4px 0 0">Publique habilidades, troque mensagens e avalie parceiros.</p>
+        </div>
+        <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap">
+          <input id="searchInput" class="input" placeholder="Buscar por habilidade, tag ou descrição">
+          <button id="searchBtn" class="btn">Buscar</button>
+          <button id="createSkillBtn" class="btn" onclick="document.getElementById('createSkillForm').scrollIntoView({behavior:'smooth'})">Publicar habilidade</button>
+          <button id="logoutBtn" class="btn secondary">Sair</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="container section">
+      <div class="tabs">
+        <div class="tab active" data-dash-tab="skills">Habilidades</div>
+        <div class="tab" data-dash-tab="messages">Mensagens</div>
+        <div class="tab" data-dash-tab="profile">Meu Perfil</div>
+      </div>
+
+      <div id="dash-skills">
+        <div id="skillsGrid" class="grid"></div>
+      </div>
+
+      <div id="dash-messages" class="hidden">
+        <div class="card">
+          <h3 style="margin-top:0">Mensagens privadas</h3>
+          <div class="form-row">
+            <input id="msgUserId" class="input" type="number" placeholder="ID do usuário para conversar (ex.: 2)" />
+            <button id="loadThreadBtn" class="btn">Abrir conversa</button>
+          </div>
+          <div id="threadBox" class="card" style="max-height:320px; overflow:auto"></div>
+          <div class="form-row" style="display:flex; gap:8px">
+            <input id="msgContent" class="input" placeholder="Digite sua mensagem" />
+            <button id="sendMsgBtn" class="btn">Enviar</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="dash-profile" class="hidden">
+        <div class="grid">
+          <div class="card">
+            <h3 style="margin-top:0">Meu perfil</h3>
+            <form id="profileForm">
+              <div class="form-row">
+                <label>Bio</label>
+                <textarea id="profileBio" rows="3" placeholder="Conte um pouco sobre você"></textarea>
+              </div>
+              <div class="form-row">
+                <label>Localização</label>
+                <input id="profileLocation" class="input" placeholder="Cidade, País" />
+              </div>
+              <button class="btn">Salvar</button>
+            </form>
+          </div>
+          <div class="card">
+            <h3 style="margin-top:0">Minhas avaliações</h3>
+            <div id="myRatingsBox" class="stack"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="container section">
+      <div class="card">
+        <h3 style="margin-top:0">Publicar nova habilidade</h3>
+        <form id="createSkillForm">
+          <div class="form-row">
+            <label>Nome da habilidade</label>
+            <input id="skillName" class="input" placeholder="Ex.: Inglês conversação" required />
+          </div>
+          <div class="form-row">
+            <label>Descrição</label>
+            <textarea id="skillDesc" rows="3" placeholder="Conte detalhes do que você oferece"></textarea>
+          </div>
+          <div class="form-row">
+            <label>Tags (separe por vírgula)</label>
+            <input id="skillTags" class="input" placeholder="idiomas, música, edição, fotografia" />
+          </div>
+          <button class="btn">Publicar</button>
+        </form>
+      </div>
+    </section>
+
+    <section class="container section">
+      <div class="grid">
+        <div class="card">
+          <h3 style="margin-top:0">Meus Pedidos — Recebidos</h3>
+          <div id="requestsIncoming" class="stack"></div>
+        </div>
+        <div class="card">
+          <h3 style="margin-top:0">Meus Pedidos — Enviados</h3>
+          <div id="requestsOutgoing" class="stack"></div>
+        </div>
+      </div>
+    </section>
+
+    <footer class="footer">
+      © <span id="y2"></span> SkillYard — Feito por Arthur Philipp De Conto SENAC 2025
+      <script>document.getElementById('y2').textContent = new Date().getFullYear()</script>
+    </footer>
+  </main>
+
+  <!-- Modal de Autenticação -->
+  <div id="authModal" class="modal">
+    <div class="sheet">
+      <div style="display:flex; justify-content:space-between; align-items:center">
+        <div style="display:flex; gap:10px; align-items:center">
+          <img src="/logo.svg" alt="logo" style="width:22px;height:22px">
+          <strong>Entrar no SkillYard</strong>
+        </div>
+        <button id="closeModal" class="btn secondary">Fechar</button>
+      </div>
+
+      <div class="tabs" style="margin-top:12px">
+        <div data-auth-tab="login" class="tab active">Entrar</div>
+        <div data-auth-tab="register" class="tab">Cadastrar</div>
+      </div>
+
+      <form id="loginForm" data-form="login" class="form-row">
+        <input id="loginEmail" class="input" type="email" placeholder="Seu email" required />
+        <input id="loginPassword" class="input" type="password" placeholder="Sua senha" required />
+        <button class="btn">Entrar</button>
+      </form>
+
+      <form id="registerForm" data-form="register" class="form-row hidden">
+        <input id="regUsername" class="input" placeholder="Nome de usuário (ex.: arthur)" required />
+        <input id="regEmail" class="input" type="email" placeholder="Seu email" required />
+        <input id="regPassword" class="input" type="password" placeholder="Crie uma senha" required />
+        <button class="btn">Cadastrar</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal de Perfil Público -->
+  <div id="profileModal" class="modal">
+    <div class="sheet">
+      <div style="display:flex; justify-content:space-between; align-items:center">
+        <strong id="profileTitle">Perfil</strong>
+        <button id="closeProfile" class="btn secondary">Fechar</button>
+      </div>
+      <div id="profileBody" style="margin-top:12px"></div>
+    </div>
+  </div>
+
+  <script src="/api.js"></script>
+  <script src="/app.js"></script>
+  <script>
+
+    const headerLogin = document.getElementById('loginBtn');
+    const headerLogout = document.getElementById('logoutBtn');
+    const observer = new MutationObserver(() => {
+      const logged = !document.getElementById('dashboard').classList.contains('hidden');
+      headerLogin.classList.toggle('hidden', logged);
+      headerLogout.classList.toggle('hidden', !logged);
+    });
+    observer.observe(document.getElementById('dashboard'), { attributes: true, attributeFilter: ['class'] });
+  </script>
+</body>
+</html>
