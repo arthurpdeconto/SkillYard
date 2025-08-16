@@ -1,4 +1,4 @@
-# SkillYard — Plataforma de Troca de Habilidades (HTML, CSS, JS + Node/Express + MySQL)
+# SkillYard — Plataforma de Troca de Habilidades
 
 Um site completo de troca de habilidades com **login**, **cadastro**, **listagem/registro de habilidades** e **pedidos de troca**.  
 Frontend em **HTML, CSS e JavaScript e backend em **Node.js/Express** com banco **MySQL**.
