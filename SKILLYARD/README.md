@@ -1,11 +1,7 @@
 # SkillYard — Plataforma de Troca de Habilidades (HTML, CSS, JS + Node/Express + MySQL)
 
 Um site completo de troca de habilidades com **login**, **cadastro**, **listagem/registro de habilidades** e **pedidos de troca**.  
-Frontend em **HTML, CSS e JavaScript puro** e backend em **Node.js/Express** com banco **MySQL**.
-
-## Requisitos
-- Node.js 18+
-- MySQL 8+
+Frontend em **HTML, CSS e JavaScript e backend em **Node.js/Express** com banco **MySQL**.
 
 ## Passo a passo de instalação
 
@@ -27,30 +23,4 @@ Frontend em **HTML, CSS e JavaScript puro** e backend em **Node.js/Express** com
    - Acesse `http://localhost:4000`
    - Cadastre-se, faça login e use o sistema.
 
-## Scripts úteis
-- `npm run dev` — inicia com nodemon (desenvolvimento)
-- `npm start`  — inicia o servidor em produção
 
-## Estrutura
-```
-skillyard/
-├─ server/
-│  ├─ server.js
-│  ├─ db.js
-│  ├─ middleware/
-│  │  └─ auth.js
-│  ├─ routes/
-│  │  ├─ auth.js
-│  │  ├─ skills.js
-│  │  └─ requests.js
-│  ├─ schema.sql
-│  ├─ .env.example
-│  └─ package.json
-└─ client/
-   └─ public/
-      ├─ index.html
-      ├─ styles.css
-      ├─ app.js
-      ├─ api.js
-      └─ logo.svg
-```
