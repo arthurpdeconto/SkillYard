@@ -16,7 +16,6 @@ SkillYard é uma plataforma acadêmica de troca de habilidades construída sobre
 - **Prisma ORM** + **PostgreSQL** (Neon, Railway ou local)
 - **Auth.js (NextAuth)** + JWT session
 - **Zod** para validações e **pino** para observabilidade estruturada
-- **Vitest + Testing Library** para testes
 - **ESLint + Prettier** com configuração flat
 
 ## Arquitetura & Pastas
@@ -35,10 +34,8 @@ SkillYard é uma plataforma acadêmica de troca de habilidades construída sobre
 │  ├─ lib/                 # Prisma, Auth.js, RBAC, validadores
 │  ├─ styles/              # Guia de estilos e notas de UI
 │  └─ middleware.ts        # Proteção de rotas + RBAC
-├─ tests/                  # Base para Vitest + Testing Library
 ├─ next.config.ts          # Configuração Next.js
-├─ src/app/globals.css     # Estilos globais e tokens de design
-└─ vitest.config.ts        # Setup de testes
+└─ src/app/globals.css     # Estilos globais e tokens de design
 ```
 
 ## Setup Rápido
@@ -63,12 +60,26 @@ cp .env.example .env
 
 Edite `DATABASE_URL`, `NEXTAUTH_SECRET` e demais variáveis conforme seu ambiente.
 
-### 4. Banco de dados
+### 4. Banco de dados (Neon/PostgreSQL)
 
-```bash
-pnpm db:migrate       # gera o schema
-pnpm db:seed          # cria roles + usuários admin/usuário (senha 12345678)
-```
+1. Defina `DATABASE_URL` no `.env`. Exemplo (Neon com pooler):
+   ```
+   postgresql://USER:PASSWORD@HOST/dbname?sslmode=require&channel_binding=require
+   ```
+2. Gere a primeira migration e aplique localmente:
+   ```bash
+   pnpm prisma migrate dev --name init
+   ```
+   > Caso o banco já esteja provisionado, gere apenas o arquivo com  
+   > `pnpm prisma migrate dev --name init --create-only` e aplique depois com `pnpm prisma migrate deploy`.
+3. Aplique migrations em outros ambientes:
+   ```bash
+   pnpm prisma migrate deploy
+   ```
+4. Popule os dados iniciais (roles e usuários demo):
+   ```bash
+   pnpm prisma db seed
+   ```
 
 ### 5. Ambiente de desenvolvimento
 
@@ -84,7 +95,6 @@ Aplicação disponível em [http://localhost:3000](http://localhost:3000).
 - `pnpm build` / `pnpm start` – build e execução de produção
 - `pnpm lint` – checagem ESLint
 - `pnpm format:write` – aplica Prettier no projeto
-- `pnpm test` / `pnpm test:watch` – suíte Vitest
 - `pnpm db:*` – atalhos `prisma generate`, `migrate`, `db push` e `seed`
 
 ## Notas de Arquitetura
@@ -98,9 +108,8 @@ Aplicação disponível em [http://localhost:3000](http://localhost:3000).
 ## Próximos Passos Sugeridos
 
 1. Completar formulários com Server Actions (perfil, posts)
-2. Adicionar testes de integração para handlers críticos (auth, RBAC, chat)
-3. Configurar pipeline de deploy na Vercel + banco gerenciado (Neon/Railway)
-4. Criar roteiro de demo e métricas de observabilidade
+2. Configurar pipeline de deploy na Vercel + banco gerenciado (Neon/Railway)
+3. Criar roteiro de demo e métricas de observabilidade
 
 ## Licença
 

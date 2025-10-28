@@ -7,8 +7,6 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint --ext .ts,.tsx,.js,.jsx src",
-    "test": "vitest run",
-    "test:watch": "vitest",
     "format": "prettier --check .",
     "format:write": "prettier --write .",
     "db:generate": "prisma generate",
@@ -33,9 +31,6 @@
   "devDependencies": {
     "@eslint/js": "^9.38.0",
     "@next/eslint-plugin-next": "^16.0.0",
-    "@testing-library/jest-dom": "^6.9.1",
-    "@testing-library/react": "^16.3.0",
-    "@testing-library/user-event": "^14.6.1",
     "@types/node": "^24.9.1",
     "@types/react": "^19.2.2",
     "@types/react-dom": "^19.2.2",
@@ -45,13 +40,10 @@
     "eslint-config-next": "^16.0.0",
     "eslint-config-prettier": "^10.1.8",
     "globals": "^16.4.0",
-    "jsdom": "^27.0.1",
     "prettier": "^3.6.2",
     "prisma": "^6.18.0",
-    "supertest": "^7.1.4",
     "ts-node": "^10.9.2",
-    "typescript": "^5.9.3",
-    "vitest": "^4.0.4"
+    "typescript": "^5.9.3"
   },
   "prisma": {
     "seed": "ts-node --transpile-only prisma/seed.ts"
