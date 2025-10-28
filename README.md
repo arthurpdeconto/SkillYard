@@ -33,7 +33,7 @@ SkillYard é uma plataforma acadêmica de troca de habilidades construída sobre
 │  │  └─ api/              # Route handlers (auth, posts, chat)
 │  ├─ lib/                 # Prisma, Auth.js, RBAC, validadores
 │  ├─ styles/              # Guia de estilos e notas de UI
-│  └─ middleware.ts        # Proteção de rotas + RBAC
+│  └─ (private)/layout.tsx # Gatekeeper de rotas autenticadas
 ├─ next.config.ts          # Configuração Next.js
 └─ src/app/globals.css     # Estilos globais e tokens de design
 ```
@@ -99,7 +99,7 @@ Aplicação disponível em [http://localhost:3000](http://localhost:3000).
 
 ## Notas de Arquitetura
 
-- **Middleware** redireciona rotas públicas/privadas e bloqueia a área admin para perfis não autorizados.
+- **Layout protegido** em `src/app/(private)/layout.tsx` garante sessão ativa e filtra navegação Admin.
 - **Route handlers** usam `dynamic = "force-dynamic"` e Node runtime (exceto `/api/chat`, que roda no Edge) para evitar cache involuntário.
 - **Chat** usa `Deno.upgradeWebSocket` no runtime Edge, realizando broadcast simples entre clientes conectados.
 - **RBAC** centralizado em `src/lib/rbac.ts` com helpers `assertRole` / `hasRole`.

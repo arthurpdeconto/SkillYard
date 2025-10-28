@@ -1,4 +1,8 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
+
+import { auth } from "@/lib/auth";
+import { Roles } from "@/lib/rbac";
 
 import styles from "./layout.module.css";
 
@@ -13,7 +17,17 @@ const navigation = [
   { href: "/admin/users", label: "Admin" },
 ];
 
-export default function PrivateLayout({ children }: PrivateLayoutProps) {
+export default async function PrivateLayout({ children }: PrivateLayoutProps) {
+  const session = await auth();
+
+  if (!session?.user) {
+    redirect("/login");
+  }
+
+  const links = session.user.role === Roles.ADMIN
+    ? navigation
+    : navigation.filter((item) => item.href !== "/admin/users");
+
   return (
     <div className={styles.shell}>
       <header className={styles.header}>
@@ -23,7 +37,7 @@ export default function PrivateLayout({ children }: PrivateLayoutProps) {
             <h1 className={styles.brandTitle}>Troque habilidades, construa conexões</h1>
           </div>
           <nav className={styles.nav}>
-            {navigation.map((item) => (
+            {links.map((item) => (
               <Link key={item.href} href={item.href} className={styles.navLink}>
                 {item.label}
               </Link>

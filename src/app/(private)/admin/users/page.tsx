@@ -1,5 +1,7 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
 
+import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { Roles } from "@/lib/rbac";
 
@@ -8,6 +10,12 @@ import styles from "./admin-users.module.css";
 export const revalidate = 0;
 
 export default async function AdminUsersPage() {
+  const session = await auth();
+
+  if (session?.user.role !== Roles.ADMIN) {
+    redirect("/");
+  }
+
   const users = await prisma.user.findMany({
     orderBy: { createdAt: "desc" },
     select: {

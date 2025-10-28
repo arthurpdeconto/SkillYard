@@ -8,8 +8,8 @@ const nextConfig: NextConfig = {
       bodySizeLimit: "2mb",
     },
   },
-  eslint: {
-    dirs: ["src"],
+  turbopack: {
+    root: ".",
   },
 };
 
