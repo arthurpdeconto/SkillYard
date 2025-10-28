@@ -1,92 +1,107 @@
-# SkillSwap (Next.js – projeto acadêmico)
+# SkillYard
 
-App único em **Next.js** com **Auth (Credentials)**, **RBAC**, **posts** e **chat em tempo real** via **WebSocket nativo**. Preparado para **deploy na Vercel**.
+SkillYard é uma plataforma acadêmica de troca de habilidades construída sobre o **Next.js (App Router)**. O projeto unifica frontend e backend em um único repositório, oferecendo autenticação com RBAC, CRUD de posts, chat em tempo real e esteira pronta para deploy na Vercel.
 
-## ✨ Funcionalidades (MVP)
+## Visão Geral
 
-- Cadastro, login (Auth.js), edição e exclusão de conta
-- Papéis: **Admin** (gerencia usuários e posts) e **Usuário** (perfil e chat)
-- Posts informativos administráveis
-- Chat em tempo real (canal geral)
-- Deploy simples na Vercel
+- ✅ Autenticação via **Auth.js (Credentials)** com papéis **Admin** e **User**
+- ✅ Posts informativos públicos com gestão avançada para Admin
+- ✅ Chat em tempo real com WebSocket nativo (Edge runtime)
+- ✅ Prisma + PostgreSQL com seed inicial (`admin@local`, `user@local`)
+- ✅ Configuração pensada para deploy na Vercel e ambientes preview
 
-## 🧰 Stack
+## Stack Principal
 
-- **Next.js 15** (App Router) + TypeScript + Tailwind
-- **Prisma + PostgreSQL** (Neon/Railway/Local)
-- **Auth.js (NextAuth)** com **Credentials** e JWT
-- **WebSocket nativo** (Route Handler)
-- Zod, ESLint/Prettier
+- **Next.js 16 (canary)** + **TypeScript** + **CSS Modules**
+- **Prisma ORM** + **PostgreSQL** (Neon, Railway ou local)
+- **Auth.js (NextAuth)** + JWT session
+- **Zod** para validações e **pino** para observabilidade estruturada
+- **Vitest + Testing Library** para testes
+- **ESLint + Prettier** com configuração flat
 
-## 🚀 Começando
+## Arquitetura & Pastas
 
-### Pré‑requisitos
+```
+.
+├─ prisma/                 # Schema, migrations e seeds
+│  ├─ schema.prisma
+│  └─ seed.ts
+├─ public/                 # Assets estáticos
+├─ src/
+│  ├─ app/
+│  │  ├─ (public)/         # Login/Register (rotas públicas)
+│  │  ├─ (private)/        # Rotas autenticadas (feed, perfil, admin, chat)
+│  │  └─ api/              # Route handlers (auth, posts, chat)
+│  ├─ lib/                 # Prisma, Auth.js, RBAC, validadores
+│  ├─ styles/              # Guia de estilos e notas de UI
+│  └─ middleware.ts        # Proteção de rotas + RBAC
+├─ tests/                  # Base para Vitest + Testing Library
+├─ next.config.ts          # Configuração Next.js
+├─ src/app/globals.css     # Estilos globais e tokens de design
+└─ vitest.config.ts        # Setup de testes
+```
 
-- Node.js ≥ 20, pnpm ≥ 9
-- PostgreSQL ≥ 14
+## Setup Rápido
 
-### Instalação
+### 1. Pré-requisitos
+
+- Node.js **>= 20**
+- pnpm **>= 9**
+- Banco PostgreSQL acessível (local ou gerenciado)
+
+### 2. Instalação de dependências
 
 ```bash
-git clone <seu-repo>
-cd <seu-repo>
-pnpm i
+pnpm install
+```
+
+### 3. Configuração de ambiente
+
+```bash
 cp .env.example .env
 ```
 
-### Banco de dados
+Edite `DATABASE_URL`, `NEXTAUTH_SECRET` e demais variáveis conforme seu ambiente.
+
+### 4. Banco de dados
 
 ```bash
-pnpm prisma migrate dev
-pnpm prisma db seed
+pnpm db:migrate       # gera o schema
+pnpm db:seed          # cria roles + usuários admin/usuário (senha 12345678)
 ```
 
-### Rodar em desenvolvimento
+### 5. Ambiente de desenvolvimento
 
 ```bash
 pnpm dev
 ```
 
-- App: [http://localhost:3000](http://localhost:3000)
+Aplicação disponível em [http://localhost:3000](http://localhost:3000).
 
-## 🔐 Usuários demo
+## Scripts Úteis
 
-- **Admin:** `admin@local` / `12345678`
-- **Usuário:** `user@local` / `12345678`
+- `pnpm dev` – servidor Next.js em modo watch
+- `pnpm build` / `pnpm start` – build e execução de produção
+- `pnpm lint` – checagem ESLint
+- `pnpm format:write` – aplica Prettier no projeto
+- `pnpm test` / `pnpm test:watch` – suíte Vitest
+- `pnpm db:*` – atalhos `prisma generate`, `migrate`, `db push` e `seed`
 
-## 📦 Scripts úteis
+## Notas de Arquitetura
 
-- `pnpm dev` – dev server
-- `pnpm build` – build de produção
-- `pnpm start` – start (Node runtime)
-- `pnpm lint` – lint
+- **Middleware** redireciona rotas públicas/privadas e bloqueia a área admin para perfis não autorizados.
+- **Route handlers** usam `dynamic = "force-dynamic"` e Node runtime (exceto `/api/chat`, que roda no Edge) para evitar cache involuntário.
+- **Chat** usa `Deno.upgradeWebSocket` no runtime Edge, realizando broadcast simples entre clientes conectados.
+- **RBAC** centralizado em `src/lib/rbac.ts` com helpers `assertRole` / `hasRole`.
+- **Validações** reutilizam esquemas Zod (`src/lib/validators.ts`) tanto nas APIs quanto nos formulários do App Router.
 
-## 🔧 Configuração (env)
+## Próximos Passos Sugeridos
 
-Consulte `.env.example`. Variáveis mínimas:
+1. Completar formulários com Server Actions (perfil, posts)
+2. Adicionar testes de integração para handlers críticos (auth, RBAC, chat)
+3. Configurar pipeline de deploy na Vercel + banco gerenciado (Neon/Railway)
+4. Criar roteiro de demo e métricas de observabilidade
 
-```
-NEXTAUTH_URL=http://localhost:3000
-NEXTAUTH_SECRET=changeme
-DATABASE_URL=postgresql://user:pass@localhost:5432/skillswap?schema=public
-```
+## Licença
 
-## 🗺️ Roadmap
-
-- [x] Auth (Credentials) + RBAC
-- [x] CRUD de posts (Admin)
-- [x] Chat (WebSocket nativo)
-- [ ] Painel Admin (UI completa)
-- [ ] Testes
-- [ ] Deploy Vercel + DB gerenciado
-
-## 📜 Licença
-
-Uso acadêmico (MIT recomendado).
-
-## 🎥 Roteiro da apresentação (15 min)
-
-1. Login como **Admin** → criar/editar post; listar usuários
-2. **Chat** em duas abas → mensagens em tempo real
-3. Login como **Usuário** → editar perfil, exclusão da conta
-4. Mostrar repositório e URL na Vercel
+Projeto acadêmico licenciado sob **MIT**. Ajuste conforme a necessidade do time.
