@@ -92,6 +92,12 @@
   color: var(--color-muted);
 }
 
+.inputHint {
+  font-size: 0.75rem;
+  color: rgba(148, 163, 184, 0.8);
+  margin-top: -0.4rem;
+}
+
 .postInput,
 .postTextarea {
   border: 1px solid rgba(148, 163, 184, 0.35);

@@ -66,14 +66,15 @@ export function AdminUsersClient({ users, posts }: AdminUsersClientProps) {
 
   function handleCreatePost(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    const formData = new FormData(event.currentTarget);
+    const formElement = event.currentTarget;
+    const formData = new FormData(formElement);
 
     startTransition(() => {
       void createPostAction(formData)
         .then(() => {
           addToast("Post publicado com sucesso!", "success");
           setFormState({ title: "", content: "" });
-          event.currentTarget.reset();
+          formElement.reset();
         })
         .catch((error) => {
           addToast(error.message ?? "Não foi possível criar o post.", "error");
@@ -150,7 +151,9 @@ export function AdminUsersClient({ users, posts }: AdminUsersClientProps) {
               placeholder="Título do post"
               defaultValue={formState.title}
               required
+              minLength={3}
             />
+            <p className={styles.inputHint}>Use pelo menos 3 caracteres para um título descritivo.</p>
 
             <label className={styles.postLabel} htmlFor="post-content">
               Conteúdo
@@ -163,7 +166,9 @@ export function AdminUsersClient({ users, posts }: AdminUsersClientProps) {
               rows={6}
               defaultValue={formState.content}
               required
+              minLength={10}
             />
+            <p className={styles.inputHint}>Corpo do post deve ter ao menos 10 caracteres.</p>
 
             <button type="submit" className={styles.primaryButton} disabled={isPending}>
               {isPending ? "Publicando..." : "Publicar"}
