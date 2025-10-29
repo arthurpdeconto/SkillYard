@@ -46,18 +46,18 @@ export default async function AdminUsersPage() {
   return (
     <AdminUsersClient
       currentUserId={user.id}
-      users={users.map((user) => ({
-        id: user.id,
-        name: user.name,
-        email: user.email,
-        role: user.role?.name ?? Roles.USER,
-        createdAt: user.createdAt.toISOString(),
+      users={users.map((userRecord) => ({
+        id: userRecord.id,
+        name: userRecord.name,
+        email: userRecord.email,
+        role: userRecord.role?.name ?? Roles.USER,
+        createdAt: userRecord.createdAt.toISOString(),
       }))}
-      posts={posts.map((post) => ({
-        id: post.id,
-        title: post.title,
-        createdAt: post.createdAt.toISOString(),
-        author: post.author?.name ?? post.author?.email ?? "Anônimo",
+      posts={posts.map((postRecord) => ({
+        id: postRecord.id,
+        title: postRecord.title,
+        createdAt: postRecord.createdAt.toISOString(),
+        author: postRecord.author?.name ?? postRecord.author?.email ?? "Anônimo",
       }))}
     />
   );
