@@ -2,7 +2,7 @@ import { redirect } from "next/navigation";
 
 import { auth } from "@/lib/auth";
 
-import styles from "./profile.module.css";
+import styles from "../profile.module.css";
 
 export default async function ProfilePage() {
   const session = await auth();

@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
-import styles from "./chat.module.css";
+import styles from "../chat.module.css";
 
 interface ChatMessage {
   id: string;
@@ -12,60 +12,64 @@ interface ChatMessage {
 }
 
 export default function ChatPage() {
+  const [currentUser, setCurrentUser] = useState<string>("Participante");
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [message, setMessage] = useState("");
   const [isConnected, setIsConnected] = useState(false);
-  const socketRef = useRef<WebSocket | null>(null);
-
-  const wsUrl = useMemo(() => {
-    if (typeof window === "undefined") {
-      return "";
-    }
-
-    const protocol = window.location.protocol === "https:" ? "wss" : "ws";
-    return `${protocol}://${window.location.host}/api/chat`;
-  }, []);
+  const eventSourceRef = useRef<EventSource | null>(null);
 
   useEffect(() => {
-    if (!wsUrl) {
-      return undefined;
-    }
+    let cancelled = false;
 
-    const socket = new WebSocket(wsUrl);
-    socketRef.current = socket;
+    fetch("/api/auth/session")
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (!cancelled && data?.user) {
+          setCurrentUser(data.user.name ?? data.user.email ?? "Participante");
+        }
+      })
+      .catch(() => {
+        // mantém o rótulo padrão
+      });
 
-    socket.addEventListener("open", () => setIsConnected(true));
-    socket.addEventListener("close", () => setIsConnected(false));
-    socket.addEventListener("message", (event) => {
+    const source = new EventSource("/api/chat");
+    eventSourceRef.current = source;
+
+    source.onopen = () => setIsConnected(true);
+    source.onerror = () => setIsConnected(false);
+    source.onmessage = (event) => {
       try {
-        const payload = JSON.parse(event.data.toString()) as ChatMessage;
+        const payload = JSON.parse(event.data) as ChatMessage;
         setMessages((prev) => [...prev, payload]);
       } catch {
-        // ignore invalid payloads
+        // formato inesperado, ignorar
       }
-    });
+    };
 
     return () => {
-      socket.close();
-      socketRef.current = null;
+      cancelled = true;
+      source.close();
+      eventSourceRef.current = null;
     };
-  }, [wsUrl]);
+  }, []);
 
-  function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (!message.trim()) {
+    const trimmed = message.trim();
+    if (!trimmed) {
       return;
     }
 
-    const payload = {
-      body: message.trim(),
-      createdAt: Date.now(),
-    };
-
     setMessage("");
 
-    if (socketRef.current?.readyState === WebSocket.OPEN) {
-      socketRef.current.send(JSON.stringify(payload));
+    try {
+      await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ author: currentUser, body: trimmed }),
+      });
+    } catch (error) {
+      console.error("Failed to send chat message", error);
     }
   }
 
