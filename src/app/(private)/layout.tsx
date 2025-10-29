@@ -1,3 +1,4 @@
+import type { Route } from "next";
 import { redirect } from "next/navigation";
 
 import { auth } from "@/lib/auth";
@@ -10,7 +11,7 @@ type PrivateLayoutProps = Readonly<{
   children: React.ReactNode;
 }>;
 
-const navigation = [
+const navigation: ReadonlyArray<{ href: Route; label: string }> = [
   { href: "/", label: "Início" },
   { href: "/profile", label: "Perfil" },
   { href: "/chat", label: "Chat" },

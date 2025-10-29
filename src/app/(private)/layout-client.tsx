@@ -1,18 +1,19 @@
 "use client";
 
+import type { Route } from "next";
 import Link from "next/link";
 import { signOut } from "next-auth/react";
 
 import styles from "./layout.module.css";
 
-interface NavigationItem {
-  href: string;
+type NavigationItem = {
+  href: Route;
   label: string;
-}
+};
 
-interface LayoutClientProps {
-  links: NavigationItem[];
-}
+type LayoutClientProps = {
+  links: ReadonlyArray<NavigationItem>;
+};
 
 export function LayoutClient({ links }: LayoutClientProps) {
   return (
@@ -28,7 +29,11 @@ export function LayoutClient({ links }: LayoutClientProps) {
               {item.label}
             </Link>
           ))}
-          <button type="button" className={styles.logoutButton} onClick={() => signOut({ callbackUrl: "/login" })}>
+          <button
+            type="button"
+            className={styles.logoutButton}
+            onClick={() => signOut({ callbackUrl: "/login" })}
+          >
             Sair
           </button>
         </nav>
