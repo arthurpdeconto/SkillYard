@@ -5,12 +5,13 @@ import { ADMIN_ONLY, assertRole } from "@/lib/rbac";
 import { auth } from "@/lib/auth";
 import { postUpdateSchema } from "@/lib/validators";
 
+type Params = { id: string };
+type HandlerContext = {
+  params: Promise<Params>;
+};
+
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
-
-type HandlerContext = {
-  params: Promise<{ id: string }>;
-};
 
 export async function PATCH(request: NextRequest, { params }: HandlerContext) {
   const { id } = await params;
