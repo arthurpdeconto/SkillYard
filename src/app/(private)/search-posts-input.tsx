@@ -1,5 +1,6 @@
 "use client";
 
+import type { Route } from "next";
 import { type ChangeEvent, useEffect, useState, useTransition } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
@@ -11,7 +12,8 @@ interface SearchPostsInputProps {
 
 export function SearchPostsInput({ initialQuery }: SearchPostsInputProps) {
   const router = useRouter();
-  const pathname = usePathname();
+  const rawPathname = usePathname();
+  const pathname = (rawPathname ?? "/") as Route;
   const searchParams = useSearchParams();
   const [value, setValue] = useState(initialQuery);
   const [isPending, startTransition] = useTransition();
@@ -34,7 +36,9 @@ export function SearchPostsInput({ initialQuery }: SearchPostsInputProps) {
       }
 
       const queryString = params.toString();
-      router.replace(queryString ? `${pathname}?${queryString}` : pathname, { scroll: false });
+      const nextUrl = (queryString ? `${pathname}?${queryString}` : pathname) as Route;
+
+      router.replace(nextUrl, { scroll: false });
     });
   }
 
