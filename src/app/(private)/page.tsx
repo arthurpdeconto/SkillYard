@@ -8,6 +8,13 @@ import { SearchPostsInput } from "./search-posts-input";
 export const revalidate = 0;
 
 type SearchParams = { q?: string } | undefined;
+type PostPreview = {
+  id: string;
+  title: string;
+  content: string;
+  createdAt: Date;
+  author: { name: string | null } | null;
+};
 
 function isPromise<T>(value: unknown): value is Promise<T> {
   return (
@@ -27,7 +34,7 @@ export default async function HomePage({ searchParams }: HomePageProps) {
   const queryParam = typeof resolvedSearchParams?.q === "string" ? resolvedSearchParams.q.trim() : "";
   const isFiltering = queryParam.length > 0;
 
-  const posts = await prisma.post.findMany({
+  const posts: PostPreview[] = await prisma.post.findMany({
     where: {
       published: true,
       ...(isFiltering
