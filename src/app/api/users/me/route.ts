@@ -1,5 +1,5 @@
 import bcrypt from "bcryptjs";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
@@ -8,7 +8,7 @@ import { userUpdateSchema } from "@/lib/validators";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-export async function PATCH(request: Request) {
+export async function PATCH(request: NextRequest) {
   const session = await auth();
 
   if (!session?.user?.id) {

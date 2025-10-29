@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
 import { prisma } from "@/lib/prisma";
 import { assertRole, ADMIN_ONLY } from "@/lib/rbac";
@@ -21,7 +21,7 @@ export async function GET() {
   return NextResponse.json(posts);
 }
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   const session = await auth();
   assertRole(session?.user?.role, ADMIN_ONLY);
 

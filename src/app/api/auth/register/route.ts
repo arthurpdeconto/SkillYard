@@ -1,5 +1,5 @@
 import bcrypt from "bcryptjs";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
 import { prisma } from "@/lib/prisma";
 import { Roles } from "@/lib/rbac";
@@ -8,7 +8,7 @@ import { registerSchema } from "@/lib/validators";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   const payload = await request.json().catch(() => null);
 
   const parsed = registerSchema.safeParse(payload);

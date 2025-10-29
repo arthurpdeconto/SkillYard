@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
 interface ChatPayload {
   id: string;
@@ -27,7 +27,7 @@ function broadcast(payload: ChatPayload) {
   }
 }
 
-export async function GET(request: Request) {
+export async function GET(request: NextRequest) {
   const stream = new TransformStream();
   const writer = stream.writable.getWriter();
 
@@ -58,7 +58,7 @@ export async function GET(request: Request) {
   });
 }
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   const body = await request.json().catch(() => null);
 
   if (!body || typeof body.body !== "string" || body.body.trim().length === 0) {

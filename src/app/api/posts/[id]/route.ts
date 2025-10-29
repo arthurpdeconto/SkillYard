@@ -5,16 +5,14 @@ import { ADMIN_ONLY, assertRole } from "@/lib/rbac";
 import { auth } from "@/lib/auth";
 import { postUpdateSchema } from "@/lib/validators";
 
-type Params = { id: string };
-type HandlerContext = {
-  params: Params | Promise<Params>;
-};
-
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-export async function PATCH(request: NextRequest, { params }: HandlerContext) {
-  const { id } = await Promise.resolve(params);
+export async function PATCH(
+  request: NextRequest,
+  context: { params: Promise<{ id: string }> },
+) {
+  const { id } = await context.params;
 
   const session = await auth();
   assertRole(session?.user?.role, ADMIN_ONLY);
@@ -40,8 +38,11 @@ export async function PATCH(request: NextRequest, { params }: HandlerContext) {
   return NextResponse.json(post);
 }
 
-export async function DELETE(_request: NextRequest, { params }: HandlerContext) {
-  const { id } = await Promise.resolve(params);
+export async function DELETE(
+  _request: NextRequest,
+  context: { params: Promise<{ id: string }> },
+) {
+  const { id } = await context.params;
 
   const session = await auth();
   assertRole(session?.user?.role, ADMIN_ONLY);
