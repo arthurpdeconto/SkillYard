@@ -26,7 +26,7 @@ export async function updateProfile(formData: FormData) {
 
   const parsed = userUpdateSchema.safeParse(payload);
   if (!parsed.success) {
-    return { error: parsed.error.errors[0]?.message ?? "Dados inválidos." };
+    return { error: parsed.error.issues[0]?.message ?? "Dados inválidos." };
   }
 
   const data: { name?: string; password?: string } = {};

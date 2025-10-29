@@ -41,14 +41,29 @@ export async function createPostAction(formData: FormData) {
     throw new Error(message);
   }
 
-  await prisma.post.create({
+  const post = await prisma.post.create({
     data: {
       ...parsed.data,
       author: session?.user?.id ? { connect: { id: session.user.id } } : undefined,
     },
+    include: {
+      author: {
+        select: {
+          name: true,
+          email: true,
+        },
+      },
+    },
   });
 
   revalidatePath("/admin/users");
+
+  return {
+    id: post.id,
+    title: post.title,
+    createdAt: post.createdAt.toISOString(),
+    author: post.author?.name ?? post.author?.email ?? "Anônimo",
+  };
 }
 
 export async function deletePostAction(postId: string) {

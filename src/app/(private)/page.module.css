@@ -22,6 +22,96 @@
   line-height: 1.6;
 }
 
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: flex-end;
+}
+
+.searchForm {
+  flex: 1;
+  min-width: min(420px, 100%);
+}
+
+.searchLabel {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.searchLegend {
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+}
+
+.searchControl {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.searchInput {
+  flex: 1;
+  border-radius: 14px;
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  background: rgba(15, 23, 42, 0.9);
+  padding: 0.7rem 1rem;
+  color: var(--color-foreground);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.searchInput:focus-visible {
+  outline: 2px solid rgba(96, 165, 250, 0.65);
+  outline-offset: 2px;
+}
+
+.clearFilters {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  border: 1px solid rgba(148, 163, 184, 0.4);
+  padding: 0.6rem 1.1rem;
+  font-size: 0.85rem;
+  color: rgba(226, 232, 240, 0.95);
+  text-decoration: none;
+  transition: border-color 0.2s ease, background 0.2s ease, color 0.2s ease, transform 0.2s ease;
+}
+
+.clearFilters:hover {
+  border-color: rgba(148, 163, 184, 0.65);
+  background: rgba(148, 163, 184, 0.12);
+  color: rgba(248, 250, 252, 0.95);
+  transform: translateY(-1px);
+}
+
+.searchControlPending .searchInput {
+  padding-right: 2.5rem;
+}
+
+.searchSpinner {
+  position: absolute;
+  right: 0.9rem;
+  width: 1rem;
+  height: 1rem;
+  border-radius: 999px;
+  border: 2px solid rgba(148, 163, 184, 0.4);
+  border-top-color: rgba(96, 165, 250, 0.9);
+  animation: spin 0.9s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
 .grid {
   display: grid;
   gap: 1.5rem;

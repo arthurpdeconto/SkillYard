@@ -5,7 +5,9 @@ SkillYard é uma plataforma acadêmica de troca de habilidades construída sobre
 ## Visão Geral
 
 - ✅ Autenticação via **Auth.js (Credentials)** com papéis **Admin** e **User**
-- ✅ Posts informativos públicos com gestão avançada para Admin
+- ✅ Posts informativos públicos com busca instantânea (`q`) no feed autenticado
+- ✅ Painel administrativo separado por sessões (Criar posts, Administrar posts, Administrar usuários)
+- ✅ Filtros refinados para localizar posts e usuários no painel, com bloqueio para excluir a própria conta
 - ✅ Chat em tempo real com WebSocket nativo (Edge runtime)
 - ✅ Prisma + PostgreSQL com seed inicial (`admin@local.dev`, `user@local.dev`)
 - ✅ Configuração pensada para deploy na Vercel e ambientes preview
@@ -110,6 +112,8 @@ Após rodar o seed, as credenciais padrão são:
 - **Route handlers** usam `dynamic = "force-dynamic"` e Node runtime (exceto `/api/chat`, que roda no Edge) para evitar cache involuntário.
 - **Chat** usa `Deno.upgradeWebSocket` no runtime Edge, realizando broadcast simples entre clientes conectados.
 - **RBAC** centralizado em `src/lib/rbac.ts` com helpers `assertRole` / `hasRole`.
+- **Painel admin** acessível em `/admin/users` com ações de server components e filtros client-side.
+- **Busca de posts** utiliza query string `?q=` e renderização server-side para manter consistência de dados.
 - **Validações** reutilizam esquemas Zod (`src/lib/validators.ts`) tanto nas APIs quanto nos formulários do App Router.
 
 ## Próximos Passos Sugeridos

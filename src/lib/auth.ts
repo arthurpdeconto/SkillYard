@@ -1,10 +1,14 @@
 import { PrismaAdapter } from "@auth/prisma-adapter";
-import NextAuth, { getServerSession, type NextAuthOptions } from "next-auth";
+import NextAuth, {
+  getServerSession,
+  type NextAuthOptions,
+  type User as NextAuthUser,
+} from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
 
 import { prisma } from "@/lib/prisma";
-import { Roles } from "@/lib/rbac";
+import { Roles, type Role } from "@/lib/rbac";
 import { loginSchema } from "@/lib/validators";
 
 export const authOptions: NextAuthOptions = {
@@ -51,12 +55,14 @@ export const authOptions: NextAuthOptions = {
         }
 
         console.log("[auth] credentials ok", email);
-        return {
+        const role = (user.role?.name ?? Roles.USER) as Role;
+        const nextAuthUser: NextAuthUser = {
           id: user.id,
           email: user.email,
           name: user.name,
-          role: user.role?.name ?? Roles.USER,
+          role,
         };
+        return nextAuthUser;
       },
     }),
   ],

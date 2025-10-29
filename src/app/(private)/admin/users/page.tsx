@@ -11,9 +11,11 @@ export const revalidate = 0;
 export default async function AdminUsersPage() {
   const session = await auth();
 
-  if (session?.user.role !== Roles.ADMIN) {
+  if (!session?.user || session.user.role !== Roles.ADMIN) {
     redirect("/");
   }
+
+  const { user } = session;
 
   const users = await prisma.user.findMany({
     orderBy: { createdAt: "desc" },
@@ -28,7 +30,6 @@ export default async function AdminUsersPage() {
 
   const posts = await prisma.post.findMany({
     orderBy: { createdAt: "desc" },
-    take: 5,
     select: {
       id: true,
       title: true,
@@ -44,6 +45,7 @@ export default async function AdminUsersPage() {
 
   return (
     <AdminUsersClient
+      currentUserId={user.id}
       users={users.map((user) => ({
         id: user.id,
         name: user.name,

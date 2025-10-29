@@ -7,6 +7,7 @@ import styles from "./admin-users.module.css";
 import { createPostAction, deletePostAction, deleteUserAction } from "./actions";
 
 interface AdminUsersClientProps {
+  currentUserId: string;
   users: {
     id: string;
     name: string | null;
@@ -28,7 +29,7 @@ interface Toast {
   kind: "success" | "error";
 }
 
-export function AdminUsersClient({ users, posts }: AdminUsersClientProps) {
+export function AdminUsersClient({ currentUserId, users, posts }: AdminUsersClientProps) {
   const [localUsers, setLocalUsers] = useState(users);
   const [localPosts, setLocalPosts] = useState(posts);
   const [toasts, setToasts] = useState<Toast[]>([]);
@@ -41,6 +42,9 @@ export function AdminUsersClient({ users, posts }: AdminUsersClientProps) {
     | { type: "post"; id: string; description: string }
     | null
   >(null);
+  const [activeSection, setActiveSection] = useState<"create" | "posts" | "users">("create");
+  const [postQuery, setPostQuery] = useState("");
+  const [userQuery, setUserQuery] = useState("");
 
   useEffect(() => {
     setIsMounted(true);
@@ -57,6 +61,11 @@ export function AdminUsersClient({ users, posts }: AdminUsersClientProps) {
   }
 
   function handleDeleteUser(userId: string, email: string) {
+    if (userId === currentUserId) {
+      addToast("Você não pode excluir sua própria conta enquanto estiver logado.", "error");
+      return;
+    }
+
     setConfirmDialog({
       type: "user",
       id: userId,
@@ -71,7 +80,10 @@ export function AdminUsersClient({ users, posts }: AdminUsersClientProps) {
 
     startTransition(() => {
       void createPostAction(formData)
-        .then(() => {
+        .then((createdPost) => {
+          if (createdPost) {
+            setLocalPosts((prev) => [createdPost, ...prev]);
+          }
           addToast("Post publicado com sucesso!", "success");
           setFormState({ title: "", content: "" });
           formElement.reset();
@@ -89,6 +101,42 @@ export function AdminUsersClient({ users, posts }: AdminUsersClientProps) {
       description: `Excluir definitivamente o post “${title}”?`,
     });
   }
+
+  const filteredPosts = useMemo(() => {
+    const query = postQuery.trim().toLowerCase();
+    if (!query) {
+      return localPosts;
+    }
+
+    return localPosts.filter((post) => {
+      const author = post.author?.toLowerCase() ?? "";
+      return post.title.toLowerCase().includes(query) || author.includes(query);
+    });
+  }, [localPosts, postQuery]);
+
+  const filteredUsers = useMemo(() => {
+    const query = userQuery.trim().toLowerCase();
+    if (!query) {
+      return localUsers;
+    }
+
+    return localUsers.filter((user) => {
+      const name = user.name?.toLowerCase() ?? "";
+      return name.includes(query) || user.email.toLowerCase().includes(query) || user.role.toLowerCase().includes(query);
+    });
+  }, [localUsers, userQuery]);
+
+  const sections = [
+    { id: "create", label: "Criar post" },
+    { id: "posts", label: "Administrar posts" },
+    { id: "users", label: "Administrar usuários" },
+  ] as const;
+
+  const hasPostQuery = postQuery.trim().length > 0;
+  const hasUserQuery = userQuery.trim().length > 0;
+
+  const postFilterSectionId = "post-filter-section";
+  const userFilterInputId = "user-filter";
 
   const executeDeletion = useCallback(() => {
     if (!confirmDialog) {
@@ -133,124 +181,215 @@ export function AdminUsersClient({ users, posts }: AdminUsersClientProps) {
         </div>
       </header>
 
-      <div className={styles.dashboardGrid}>
-        <section className={styles.editorCard}>
-          <div className={styles.cardHeader}>
-            <h3>Nova publicação</h3>
-            <p>Compartilhe atualizações importantes com a comunidade.</p>
-          </div>
-          <form className={styles.postForm} onSubmit={handleCreatePost}>
-            <label className={styles.postLabel} htmlFor="post-title">
-              Título
-            </label>
-            <input
-              id="post-title"
-              name="title"
-              type="text"
-              className={styles.postInput}
-              placeholder="Título do post"
-              defaultValue={formState.title}
-              required
-              minLength={3}
-            />
-            <p className={styles.inputHint}>Use pelo menos 3 caracteres para um título descritivo.</p>
+      <nav className={styles.sectionNav} aria-label="Seções do painel">
+        {sections.map((section) => (
+          <button
+            key={section.id}
+            type="button"
+            className={`${styles.sectionButton} ${
+              activeSection === section.id ? styles.sectionButtonActive : ""
+            }`}
+            onClick={() => setActiveSection(section.id)}
+          >
+            {section.label}
+          </button>
+        ))}
+      </nav>
 
-            <label className={styles.postLabel} htmlFor="post-content">
-              Conteúdo
-            </label>
-            <textarea
-              id="post-content"
-              name="content"
-              className={styles.postTextarea}
-              placeholder="Escreva aqui a mensagem para a comunidade"
-              rows={6}
-              defaultValue={formState.content}
-              required
-              minLength={10}
-            />
-            <p className={styles.inputHint}>Corpo do post deve ter ao menos 10 caracteres.</p>
+      <div className={styles.sectionContent}>
+        {activeSection === "create" && (
+          <section className={styles.editorCard} aria-labelledby="create-post-heading">
+            <div className={styles.cardHeader}>
+              <h3 id="create-post-heading">Nova publicação</h3>
+              <p>Compartilhe atualizações importantes com a comunidade.</p>
+            </div>
+            <form className={styles.postForm} onSubmit={handleCreatePost}>
+              <label className={styles.postLabel} htmlFor="post-title">
+                Título
+              </label>
+              <input
+                id="post-title"
+                name="title"
+                type="text"
+                className={styles.postInput}
+                placeholder="Título do post"
+                defaultValue={formState.title}
+                required
+                minLength={3}
+              />
+              <p className={styles.inputHint}>Use pelo menos 3 caracteres para um título descritivo.</p>
 
-            <button type="submit" className={styles.primaryButton} disabled={isPending}>
-              {isPending ? "Publicando..." : "Publicar"}
-            </button>
-          </form>
-        </section>
+              <label className={styles.postLabel} htmlFor="post-content">
+                Conteúdo
+              </label>
+              <textarea
+                id="post-content"
+                name="content"
+                className={styles.postTextarea}
+                placeholder="Escreva aqui a mensagem para a comunidade"
+                rows={6}
+                defaultValue={formState.content}
+                required
+                minLength={10}
+              />
+              <p className={styles.inputHint}>Corpo do post deve ter ao menos 10 caracteres.</p>
 
-        <section className={styles.tableWrapper}>
-          <div className={styles.tableHeader}>
-            <h3>Usuários cadastrados</h3>
-            <span>{localUsers.length} contas</span>
-          </div>
-          <div className={styles.tableScroll}>
-            <table className={styles.table}>
-              <thead>
-                <tr>
-                  <th>Nome</th>
-                  <th>E-mail</th>
-                  <th>Papel</th>
-                  <th>Entrou em</th>
-                  <th aria-label="Ações" />
-                </tr>
-              </thead>
-              <tbody>
-                {localUsers.map((user) => (
-                  <tr key={user.id}>
-                    <td>{user.name ?? "Sem nome"}</td>
-                    <td>{user.email}</td>
-                    <td>
-                      <span className={styles.roleBadge}>{user.role}</span>
-                    </td>
-                  <td>{new Date(user.createdAt).toLocaleDateString("pt-BR")}</td>
-                  <td>
-                    <button
-                      type="button"
-                      className={styles.outlineDangerButton}
-                      onClick={() => handleDeleteUser(user.id, user.email)}
-                      aria-label={`Excluir ${user.email}`}
-                    >
-                      Excluir
-                    </button>
-                  </td>
-                </tr>
-              ))}
-              </tbody>
-            </table>
-          </div>
+              <button type="submit" className={styles.primaryButton} disabled={isPending}>
+                {isPending ? "Publicando..." : "Publicar"}
+              </button>
+            </form>
+          </section>
+        )}
 
-          {localUsers.length === 0 && (
-            <p className={styles.empty}>Nenhum usuário encontrado.</p>
-          )}
-        </section>
+        {activeSection === "posts" && (
+          <section className={styles.postsCard} aria-labelledby="manage-posts-heading">
+            <div className={styles.cardHeader}>
+              <div>
+                <h3 id="manage-posts-heading">Administrar posts</h3>
+                <p>Revise publicações, encontre conteúdos específicos e remova posts antigos.</p>
+              </div>
+              <span className={styles.cardBadge}>
+                {filteredPosts.length} {filteredPosts.length === 1 ? "post" : "posts"}
+              </span>
+            </div>
 
-        <section className={styles.postsCard}>
-          <div className={styles.cardHeader}>
-            <h3>Últimas publicações</h3>
-            <p>Visão rápida dos posts recentes.</p>
-          </div>
-          <ul className={styles.postList}>
-            {localPosts.map((post) => (
-              <li key={post.id} className={styles.postItem}>
-                <div className={styles.postContent}>
-                  <div>
-                    <p className={styles.postTitle}>{post.title}</p>
-                    <p className={styles.postMeta}>
-                      {post.author} — {new Date(post.createdAt).toLocaleDateString("pt-BR")}
-                    </p>
-                  </div>
-                  <button
-                    type="button"
-                    className={`${styles.postActionButton} ${styles.outlineDangerButton}`}
-                    onClick={() => handleDeletePost(post.id, post.title)}
-                    aria-label={`Excluir post ${post.title}`}
-                  >
-                    Excluir
-                  </button>
-                </div>
-              </li>
-            ))}
-            {localPosts.length === 0 && <li className={styles.empty}>Nenhum post publicado ainda.</li>}
-          </ul>
-        </section>
+            <div className={styles.sectionControls}>
+              <label className={styles.searchLabel} htmlFor={postFilterSectionId}>
+                <span className={styles.searchLabelText}>Filtro da sessão</span>
+                <input
+                  id={postFilterSectionId}
+                  type="search"
+                  className={styles.searchInput}
+                  placeholder="Buscar por título ou autor"
+                  value={postQuery}
+                  onChange={(event) => setPostQuery(event.target.value)}
+                />
+              </label>
+              {hasPostQuery && (
+                <button
+                  type="button"
+                  className={styles.clearFilterButton}
+                  onClick={() => setPostQuery("")}
+                >
+                  Limpar
+                </button>
+              )}
+            </div>
+
+            {filteredPosts.length === 0 ? (
+              <p className={styles.empty}>
+                {hasPostQuery ? "Nenhum post encontrado com esse filtro." : "Nenhum post publicado ainda."}
+              </p>
+            ) : (
+              <ul className={styles.postList}>
+                {filteredPosts.map((post) => (
+                  <li key={post.id} className={styles.postItem}>
+                    <div className={styles.postContent}>
+                      <div>
+                        <p className={styles.postTitle}>{post.title}</p>
+                        <p className={styles.postMeta}>
+                          {post.author} — {new Date(post.createdAt).toLocaleDateString("pt-BR")}
+                        </p>
+                      </div>
+                      <button
+                        type="button"
+                        className={`${styles.postActionButton} ${styles.outlineDangerButton}`}
+                        onClick={() => handleDeletePost(post.id, post.title)}
+                        aria-label={`Excluir post ${post.title}`}
+                      >
+                        Excluir
+                      </button>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </section>
+        )}
+
+        {activeSection === "users" && (
+          <section className={styles.tableWrapper} aria-labelledby="manage-users-heading">
+            <div className={styles.tableHeader}>
+              <div>
+                <h3 id="manage-users-heading">Usuários cadastrados</h3>
+                <p className={styles.tableSubtitle}>
+                  Exibindo {filteredUsers.length} de {localUsers.length} contas registradas.
+                </p>
+              </div>
+            </div>
+
+            <div className={`${styles.sectionControls} ${styles.sectionControlsTable}`}>
+              <label className={styles.searchLabel} htmlFor={userFilterInputId}>
+                <span className={styles.searchLabelText}>Filtrar usuários</span>
+                <input
+                  id={userFilterInputId}
+                  type="search"
+                  className={styles.searchInput}
+                  placeholder="Buscar por nome, e-mail ou papel"
+                  value={userQuery}
+                  onChange={(event) => setUserQuery(event.target.value)}
+                />
+              </label>
+              {hasUserQuery && (
+                <button
+                  type="button"
+                  className={styles.clearFilterButton}
+                  onClick={() => setUserQuery("")}
+                >
+                  Limpar
+                </button>
+              )}
+            </div>
+
+            <div className={styles.tableScroll}>
+              <table className={styles.table}>
+                <thead>
+                  <tr>
+                    <th>Nome</th>
+                    <th>E-mail</th>
+                    <th>Papel</th>
+                    <th>Entrou em</th>
+                    <th aria-label="Ações" />
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredUsers.map((user) => {
+                    const isSelf = user.id === currentUserId;
+                    return (
+                      <tr key={user.id}>
+                        <td>{user.name ?? "Sem nome"}</td>
+                        <td>{user.email}</td>
+                        <td>
+                          <span className={styles.roleBadge}>{user.role}</span>
+                        </td>
+                        <td>{new Date(user.createdAt).toLocaleDateString("pt-BR")}</td>
+                        <td>
+                          {!isSelf && (
+                            <button
+                              type="button"
+                              className={styles.outlineDangerButton}
+                              onClick={() => handleDeleteUser(user.id, user.email)}
+                              aria-label={`Excluir ${user.email}`}
+                              disabled={isPending}
+                            >
+                              Excluir
+                            </button>
+                          )}
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+
+            {filteredUsers.length === 0 && (
+              <p className={styles.empty}>
+                {hasUserQuery ? "Nenhum usuário corresponde ao filtro informado." : "Nenhum usuário encontrado."}
+              </p>
+            )}
+          </section>
+        )}
       </div>
 
       {isMounted &&
