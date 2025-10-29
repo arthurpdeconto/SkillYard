@@ -6,17 +6,23 @@ import { useState } from "react";
 
 import styles from "../auth.module.css";
 
+interface Toast {
+  id: number;
+  message: string;
+  kind: "success" | "error";
+}
+
 export default function LoginPage() {
   const searchParams = useSearchParams();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [toasts, setToasts] = useState<Toast[]>([]);
+  const toastIdRef = useState({ current: 0 })[0];
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setIsSubmitting(true);
-    setError(null);
 
     const callbackUrl = searchParams.get("callbackUrl") ?? "/";
 
@@ -28,12 +34,25 @@ export default function LoginPage() {
     });
 
     if (result?.error) {
-      setError("Credenciais inválidas.");
+      pushToast("Credenciais inválidas.", "error");
       setIsSubmitting(false);
       return;
     }
 
-    window.location.href = callbackUrl;
+    pushToast("Login realizado com sucesso!", "success");
+    setTimeout(() => {
+      window.location.href = callbackUrl;
+    }, 600);
+  }
+
+  function pushToast(message: string, kind: "success" | "error") {
+    const id = ++toastIdRef.current;
+    setToasts((prev) => [...prev, { id, message, kind }]);
+    setTimeout(() => dismissToast(id), 4000);
+  }
+
+  function dismissToast(id: number) {
+    setToasts((prev) => prev.filter((toast) => toast.id !== id));
   }
 
   return (
@@ -68,8 +87,6 @@ export default function LoginPage() {
           />
         </label>
 
-        {error && <p className={styles.error}>{error}</p>}
-
         <button type="submit" className={styles.button} disabled={isSubmitting}>
           {isSubmitting ? "Entrando..." : "Entrar"}
         </button>
@@ -81,6 +98,29 @@ export default function LoginPage() {
           Cadastre-se
         </a>
       </p>
+
+      {toasts.length > 0 && (
+        <div className={styles.toastRegion} aria-live="assertive" role="status">
+          {toasts.map((toast) => (
+            <div
+              key={toast.id}
+              className={`${styles.toast} ${
+                toast.kind === "success" ? styles.toastSuccess : styles.toastError
+              }`}
+            >
+              <span>{toast.message}</span>
+              <button
+                type="button"
+                className={styles.toastClose}
+                onClick={() => dismissToast(toast.id)}
+                aria-label="Fechar mensagem"
+              >
+                ×
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

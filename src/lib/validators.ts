@@ -26,3 +26,15 @@ export const postUpdateSchema = postCreateSchema
   .refine((value) => Object.keys(value).length > 0, {
     message: "Forneça ao menos um campo para atualizar",
   });
+
+export const userUpdateSchema = registerSchema
+  .pick({
+    name: true,
+    password: true,
+  })
+  .partial()
+  .refine((value) =>
+    Object.values(value).some((field) => typeof field === "string" && field.trim().length > 0),
+  {
+    message: "Informe ao menos um campo para atualizar",
+  });

@@ -7,7 +7,7 @@ SkillYard é uma plataforma acadêmica de troca de habilidades construída sobre
 - ✅ Autenticação via **Auth.js (Credentials)** com papéis **Admin** e **User**
 - ✅ Posts informativos públicos com gestão avançada para Admin
 - ✅ Chat em tempo real com WebSocket nativo (Edge runtime)
-- ✅ Prisma + PostgreSQL com seed inicial (`admin@local`, `user@local`)
+- ✅ Prisma + PostgreSQL com seed inicial (`admin@local.dev`, `user@local.dev`)
 - ✅ Configuração pensada para deploy na Vercel e ambientes preview
 
 ## Stack Principal
@@ -88,6 +88,13 @@ pnpm dev
 ```
 
 Aplicação disponível em [http://localhost:3000](http://localhost:3000).
+
+### Contas demo
+
+Após rodar o seed, as credenciais padrão são:
+
+- Admin: `admin@local.dev` / `12345678`
+- Usuário: `user@local.dev` / `12345678`
 
 ## Scripts Úteis
 

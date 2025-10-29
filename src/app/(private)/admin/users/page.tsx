@@ -1,11 +1,10 @@
-import Link from "next/link";
 import { redirect } from "next/navigation";
 
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { Roles } from "@/lib/rbac";
 
-import styles from "./admin-users.module.css";
+import { AdminUsersClient } from "./admin-users-client";
 
 export const revalidate = 0;
 
@@ -27,48 +26,37 @@ export default async function AdminUsersPage() {
     },
   });
 
+  const posts = await prisma.post.findMany({
+    orderBy: { createdAt: "desc" },
+    take: 5,
+    select: {
+      id: true,
+      title: true,
+      createdAt: true,
+      author: {
+        select: {
+          name: true,
+          email: true,
+        },
+      },
+    },
+  });
+
   return (
-    <section className={styles.page}>
-      <header className={styles.header}>
-        <div className={styles.copy}>
-          <h2 className={styles.heading}>Painel administrativo</h2>
-          <p className={styles.description}>
-            Gerencie usuários, promova colaboradores e acompanhe novas contas.
-          </p>
-        </div>
-        <Link href="/" className={styles.primaryLink}>
-          Ver posts
-        </Link>
-      </header>
-
-      <div className={styles.tableWrapper}>
-        <table className={styles.table}>
-          <thead>
-            <tr>
-              <th>Nome</th>
-              <th>E-mail</th>
-              <th>Papel</th>
-              <th>Entrou em</th>
-            </tr>
-          </thead>
-          <tbody>
-            {users.map((user) => (
-              <tr key={user.id}>
-                <td>{user.name ?? "Sem nome"}</td>
-                <td>{user.email}</td>
-                <td>
-                  <span className={styles.roleBadge}>{user.role?.name ?? Roles.USER}</span>
-                </td>
-                <td>{user.createdAt.toLocaleDateString("pt-BR")}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-
-        {users.length === 0 && (
-          <p className={styles.empty}>Nenhum usuário encontrado. Execute o seed para gerar um administrador padrão.</p>
-        )}
-      </div>
-    </section>
+    <AdminUsersClient
+      users={users.map((user) => ({
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        role: user.role?.name ?? Roles.USER,
+        createdAt: user.createdAt.toISOString(),
+      }))}
+      posts={posts.map((post) => ({
+        id: post.id,
+        title: post.title,
+        createdAt: post.createdAt.toISOString(),
+        author: post.author?.name ?? post.author?.email ?? "Anônimo",
+      }))}
+    />
   );
 }

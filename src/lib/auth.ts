@@ -23,9 +23,11 @@ export const authOptions: NextAuthOptions = {
         password: { label: "Password", type: "password" },
       },
       async authorize(rawCredentials) {
+        console.log("[auth] Attempting credentials signin", rawCredentials?.email);
         const parsed = loginSchema.safeParse(rawCredentials);
 
         if (!parsed.success) {
+          console.log("[auth] invalid payload", parsed.error.format());
           return null;
         }
 
@@ -37,15 +39,18 @@ export const authOptions: NextAuthOptions = {
         });
 
         if (!user || !user.password) {
+          console.log("[auth] user not found or missing password", email);
           return null;
         }
 
         const isValid = await bcrypt.compare(password, user.password);
 
         if (!isValid) {
+          console.log("[auth] invalid password", email);
           return null;
         }
 
+        console.log("[auth] credentials ok", email);
         return {
           id: user.id,
           email: user.email,
