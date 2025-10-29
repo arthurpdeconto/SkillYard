@@ -6,11 +6,11 @@ const nextConfig: NextConfig = {
   },
   poweredByHeader: false,
   reactStrictMode: true,
+  typedRoutes: true,
   experimental: {
     serverActions: {
       bodySizeLimit: "2mb",
     },
-    typedRoutes: false,
   },
   turbopack: {
     root: ".",
