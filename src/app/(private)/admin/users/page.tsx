@@ -1,3 +1,4 @@
+import type { Prisma } from "@prisma/client";
 import { redirect } from "next/navigation";
 
 import { auth } from "@/lib/auth";
@@ -46,14 +47,14 @@ export default async function AdminUsersPage() {
   return (
     <AdminUsersClient
       currentUserId={user.id}
-      users={users.map((userRecord) => ({
+      users={users.map((userRecord: typeof users[number]) => ({
         id: userRecord.id,
         name: userRecord.name,
         email: userRecord.email,
         role: userRecord.role?.name ?? Roles.USER,
         createdAt: userRecord.createdAt.toISOString(),
       }))}
-      posts={posts.map((postRecord) => ({
+      posts={posts.map((postRecord: typeof posts[number]) => ({
         id: postRecord.id,
         title: postRecord.title,
         createdAt: postRecord.createdAt.toISOString(),
