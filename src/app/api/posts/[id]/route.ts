@@ -7,14 +7,14 @@ import { postUpdateSchema } from "@/lib/validators";
 
 type Params = { id: string };
 type HandlerContext = {
-  params: Promise<Params>;
+  params: Params | Promise<Params>;
 };
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 export async function PATCH(request: NextRequest, { params }: HandlerContext) {
-  const { id } = await params;
+  const { id } = await Promise.resolve(params);
 
   const session = await auth();
   assertRole(session?.user?.role, ADMIN_ONLY);
@@ -41,7 +41,7 @@ export async function PATCH(request: NextRequest, { params }: HandlerContext) {
 }
 
 export async function DELETE(_request: NextRequest, { params }: HandlerContext) {
-  const { id } = await params;
+  const { id } = await Promise.resolve(params);
 
   const session = await auth();
   assertRole(session?.user?.role, ADMIN_ONLY);
