@@ -5,7 +5,7 @@ import NextAuth, {
   type User as NextAuthUser,
 } from "next-auth";
 import Credentials from "next-auth/providers/credentials";
-import bcrypt from "bcryptjs";
+import * as bcrypt from "bcryptjs";
 
 import { prisma } from "@/lib/prisma";
 import { Roles, type Role } from "@/lib/rbac";

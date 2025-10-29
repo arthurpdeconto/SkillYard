@@ -1,4 +1,4 @@
-import bcrypt from "bcryptjs";
+import * as bcrypt from "bcryptjs";
 import { NextRequest, NextResponse } from "next/server";
 
 import { auth } from "@/lib/auth";

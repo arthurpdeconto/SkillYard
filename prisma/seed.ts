@@ -1,4 +1,4 @@
-import bcrypt from "bcryptjs";
+import * as bcrypt from "bcryptjs";
 
 import { prisma } from "../src/lib/prisma";
 import { Roles } from "../src/lib/rbac";
