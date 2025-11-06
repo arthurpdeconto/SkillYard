@@ -7,14 +7,17 @@ import { SearchPostsInput } from "./search-posts-input";
 
 export const revalidate = 0;
 
-type SearchParams = { q?: string } | undefined;
-type PostPreview = {
+interface SearchParams {
+  q?: string;
+}
+
+interface PostPreview {
   id: string;
   title: string;
   content: string;
   createdAt: Date;
   author: { name: string | null } | null;
-};
+}
 
 function isPromise<T>(value: unknown): value is Promise<T> {
   return (

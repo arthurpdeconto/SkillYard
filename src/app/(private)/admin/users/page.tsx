@@ -6,20 +6,20 @@ import { Roles } from "@/lib/rbac";
 
 import { AdminUsersClient } from "./admin-users-client";
 
-type UserRecord = {
+interface UserRecord {
   id: string;
   name: string | null;
   email: string;
   role: { name: string } | null;
   createdAt: Date;
-};
+}
 
-type PostRecord = {
+interface PostRecord {
   id: string;
   title: string;
   createdAt: Date;
   author: { name: string | null; email: string | null } | null;
-};
+}
 
 export const revalidate = 0;
 

@@ -7,11 +7,16 @@ import { Roles } from "@/lib/rbac";
 import styles from "./layout.module.css";
 import { LayoutClient } from "./layout-client";
 
-type PrivateLayoutProps = Readonly<{
+interface PrivateLayoutProps {
   children: React.ReactNode;
-}>;
+}
 
-const navigation: ReadonlyArray<{ href: Route; label: string }> = [
+interface NavigationLink {
+  href: Route;
+  label: string;
+}
+
+const navigation: readonly NavigationLink[] = [
   { href: "/", label: "Início" },
   { href: "/profile", label: "Perfil" },
   { href: "/chat", label: "Chat" },

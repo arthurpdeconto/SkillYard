@@ -38,3 +38,16 @@ export const userUpdateSchema = registerSchema
   {
     message: "Informe ao menos um campo para atualizar",
   });
+
+export const directMessageSchema = z.object({
+  recipientId: z.string().min(1, "Destinatário obrigatório"),
+  body: z
+    .string()
+    .trim()
+    .min(1, "Mensagem muito curta")
+    .max(2000, "Mensagem muito longa"),
+});
+
+export const friendRequestSchema = z.object({
+  friendId: z.string().min(1, "Usuário inválido"),
+});

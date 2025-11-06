@@ -6,14 +6,14 @@ import { signOut } from "next-auth/react";
 
 import styles from "./layout.module.css";
 
-type NavigationItem = {
+interface NavigationItem {
   href: Route;
   label: string;
-};
+}
 
-type LayoutClientProps = {
-  links: ReadonlyArray<NavigationItem>;
-};
+interface LayoutClientProps {
+  links: readonly NavigationItem[];
+}
 
 export function LayoutClient({ links }: LayoutClientProps) {
   return (
