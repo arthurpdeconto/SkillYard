@@ -69,9 +69,9 @@ export default async function HomePage({ searchParams }: HomePageProps) {
   return (
     <section className={styles.page}>
       <header className={styles.header}>
-        <h2 className={styles.heading}>Posts recentes</h2>
+        <h2 className={styles.heading}>Habilidades recentes</h2>
         <p className={styles.description}>
-          Conteúdos produzidos pela comunidade para estimular novas conexões e trocas.
+          Conteúdos produzidos pela comunidade para estimular novos conhecimentos e trocas.
         </p>
       </header>
 
