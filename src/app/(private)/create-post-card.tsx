@@ -58,8 +58,8 @@ export function CreatePostCard() {
   return (
     <section className={styles.createCard} aria-labelledby="create-post-heading">
       <div className={styles.createHeader}>
-        <h3 id="create-post-heading">Compartilhe uma novidade</h3>
-        <p>Divulgue oportunidades, vitórias pessoais ou dicas que possam ajudar a comunidade.</p>
+        <h3 id="create-post-heading">Compartilhe uma solicitação de troca de habilidade.</h3>
+        <p>Divulgue habilidades, troque elas com users ou dicas que possam ajudar a comunidade.</p>
       </div>
 
       {feedback && (
@@ -82,7 +82,7 @@ export function CreatePostCard() {
           name="title"
           type="text"
           className={styles.createInput}
-          placeholder="Ex.: Networking na próxima semana"
+          placeholder="Ex.: Ofereço Ajuda Técnica em PYTHON em troca de..."
           value={formState.title}
           onChange={updateField("title")}
           disabled={isPending}
