@@ -2,7 +2,6 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
 import { prisma } from "@/lib/prisma";
-import { assertRole, ADMIN_ONLY } from "@/lib/rbac";
 import { auth } from "@/lib/auth";
 import { postCreateSchema } from "@/lib/validators";
 
@@ -24,7 +23,10 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   const session = await auth();
-  assertRole(session?.user?.role, ADMIN_ONLY);
+
+  if (!session?.user?.id) {
+    return NextResponse.json({ message: "É necessário estar autenticado para criar um post." }, { status: 401 });
+  }
 
   const payload = await request.json().catch(() => null);
   const parsed = postCreateSchema.safeParse(payload);
@@ -46,9 +48,7 @@ export async function POST(request: NextRequest) {
       title,
       content,
       published,
-      author: session?.user?.id
-        ? { connect: { id: session.user.id } }
-        : undefined,
+      author: { connect: { id: session.user.id } },
     },
   });
 

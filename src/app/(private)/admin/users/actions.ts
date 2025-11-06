@@ -5,7 +5,7 @@ import { revalidatePath } from "next/cache";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { Roles } from "@/lib/rbac";
-import { postCreateSchema } from "@/lib/validators";
+import { createPostAction as sharedCreatePostAction } from "../../posts/actions";
 
 function assertAdmin(role: string | undefined) {
   if (role !== Roles.ADMIN) {
@@ -26,44 +26,7 @@ export async function deleteUserAction(userId: string) {
 }
 
 export async function createPostAction(formData: FormData) {
-  const session = await auth();
-  assertAdmin(session?.user?.role);
-
-  const payload = {
-    title: formData.get("title"),
-    content: formData.get("content"),
-    published: true,
-  };
-
-  const parsed = postCreateSchema.safeParse(payload);
-  if (!parsed.success) {
-    const message = parsed.error.issues[0]?.message ?? "Dados inválidos";
-    throw new Error(message);
-  }
-
-  const post = await prisma.post.create({
-    data: {
-      ...parsed.data,
-      author: session?.user?.id ? { connect: { id: session.user.id } } : undefined,
-    },
-    include: {
-      author: {
-        select: {
-          name: true,
-          email: true,
-        },
-      },
-    },
-  });
-
-  revalidatePath("/admin/users");
-
-  return {
-    id: post.id,
-    title: post.title,
-    createdAt: post.createdAt.toISOString(),
-    author: post.author?.name ?? post.author?.email ?? "Anônimo",
-  };
+  return sharedCreatePostAction(formData);
 }
 
 export async function deletePostAction(postId: string) {

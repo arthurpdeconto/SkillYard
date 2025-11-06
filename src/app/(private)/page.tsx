@@ -3,6 +3,8 @@ import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 
 import styles from "./page.module.css";
+import { CreatePostCard } from "./create-post-card";
+import { PostsList } from "./posts-list";
 import { SearchPostsInput } from "./search-posts-input";
 
 export const revalidate = 0;
@@ -88,28 +90,22 @@ export default async function HomePage({ searchParams }: HomePageProps) {
         )}
       </div>
 
-      <div className={styles.grid}>
-        {posts.map((post) => (
-          <article key={post.id} className={styles.card}>
-            <div className={styles.meta}>
-              <span>{post.author?.name ?? "Equipe SkillYard"}</span>
-              <time dateTime={post.createdAt.toISOString()}>
-                {post.createdAt.toLocaleDateString("pt-BR")}
-              </time>
-            </div>
-            <h3 className={styles.cardTitle}>{post.title}</h3>
-            <p className={styles.cardContent}>{post.content}</p>
-          </article>
-        ))}
+      <CreatePostCard />
 
-        {posts.length === 0 && (
-          <div className={styles.empty}>
-            {isFiltering
-              ? "Nenhum post corresponde ao filtro aplicado. Tente palavras-chave diferentes."
-              : "Nenhum conteúdo publicado ainda. Admins podem criar o primeiro post na área administrativa."}
-          </div>
-        )}
-      </div>
+      <PostsList
+        posts={posts.map((post) => ({
+          id: post.id,
+          title: post.title,
+          content: post.content,
+          authorLabel: post.author?.name ?? "Equipe SkillYard",
+          createdAt: post.createdAt.toISOString(),
+        }))}
+        emptyMessage={
+          isFiltering
+            ? "Nenhum post corresponde ao filtro aplicado. Tente palavras-chave diferentes."
+            : "Nenhum conteúdo publicado ainda. Que tal escrever o primeiro?"
+        }
+      />
     </section>
   );
 }
