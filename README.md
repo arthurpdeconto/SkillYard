@@ -91,13 +91,6 @@ pnpm dev
 
 Aplicação disponível em [http://localhost:3000](http://localhost:3000).
 
-### Contas demo
-
-Após rodar o seed, as credenciais padrão são:
-
-- Admin: `admin@local.dev` / `12345678`
-- Usuário: `user@local.dev` / `12345678`
-
 ## Scripts Úteis
 
 - `pnpm dev` – servidor Next.js em modo watch
@@ -106,22 +99,4 @@ Após rodar o seed, as credenciais padrão são:
 - `pnpm format:write` – aplica Prettier no projeto
 - `pnpm db:*` – atalhos `prisma generate`, `migrate`, `db push` e `seed`
 
-## Notas de Arquitetura
 
-- **Layout protegido** em `src/app/(private)/layout.tsx` garante sessão ativa e filtra navegação Admin.
-- **Route handlers** usam `dynamic = "force-dynamic"` e Node runtime (exceto `/api/chat`, que roda no Edge) para evitar cache involuntário.
-- **Chat** usa `Deno.upgradeWebSocket` no runtime Edge, realizando broadcast simples entre clientes conectados.
-- **RBAC** centralizado em `src/lib/rbac.ts` com helpers `assertRole` / `hasRole`.
-- **Painel admin** acessível em `/admin/users` com ações de server components e filtros client-side.
-- **Busca de posts** utiliza query string `?q=` e renderização server-side para manter consistência de dados.
-- **Validações** reutilizam esquemas Zod (`src/lib/validators.ts`) tanto nas APIs quanto nos formulários do App Router.
-
-## Próximos Passos Sugeridos
-
-1. Completar formulários com Server Actions (perfil, posts)
-2. Configurar pipeline de deploy na Vercel + banco gerenciado (Neon/Railway)
-3. Criar roteiro de demo e métricas de observabilidade
-
-## Licença
-
-Projeto acadêmico licenciado sob **MIT**. Ajuste conforme a necessidade do time.
